@@ -1,0 +1,202 @@
+openapi: 3.0.0
+info:
+  title: Отправка команд в бэк 2150
+  version: 0.0.1
+servers:
+- url: https://sfera.inno.local/knowledge/pages?id=1160712
+  description: Dev server
+- url: https://sfera.inno.local/knowledge/pages?id=1160711
+  description: Test server
+- url: https://sfera.inno.local/knowledge/pages?id=1160713
+  description: preprod server
+paths:
+  /tasks:
+    get:
+      summary: Метод получения списка задач
+      tags:
+      - task
+      operationId: getAllTasks
+      responses:
+        '200':
+          description: Успшеный ответ с информацией о задаче
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/tasks"
+        '400':
+          description: Неправильный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        '404':
+          description: Отсутствуют данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+    post:
+      summary: Метод отправки команды
+      tags:
+      - task
+      operationId: doCommand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+               $ref: "#/components/schemas/command"
+      responses:
+        '200':
+          description: Успешный ответ об отправке команды
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/commandResponseArray"
+        '400':
+          description: Неправильный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+          
+  /tasks/{task_id}:
+   get:
+      summary: Метод получения задачи
+      tags:
+      - task
+      operationId: getTaskInfo
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        description: идентификатор задачи
+        schema:
+          type: string
+        example: 42abcd2b-9f3c-3d4f-0dsas
+      responses:
+        '200':
+          description: Успшеный ответ с информацией о задаче
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/task"
+        '400':
+          description: Неправильный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+        '404':
+          description: Отсутствуют данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+   delete:
+      summary: Метод удаления задачи
+      tags:
+      - task
+      operationId: deleteTask
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        description: идентификатор задачи
+        schema:
+          type: string
+        example: 42abcd2b-9f3c-3d4f-0dsas
+      responses:
+        '200':
+          description: Задача удалена
+          content:
+            application/json: {}
+        '400':
+          description: Неправильный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+            
+components:
+  schemas:
+    task:
+      type: object
+      required:
+      - task_id
+      properties:
+        task_id:
+          type: string
+          example: 42abcd2b-9f3c-3d4f-0dsas
+        name: 
+          type: string
+          example: Расхождение реконсиляции
+        status:
+          type: string
+          enum:
+            - created
+            - in progress
+            - done
+          description: Статус задачи
+    tasks:
+      type: array
+      items:
+        $ref: "#/components/schemas/task"
+    error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: integer
+            message: 
+              type: string
+    command:
+      type: object
+      required:
+      - task_id
+      - command_id
+      - document_id
+      - comment
+      properties:
+        task_id:
+          type: string
+          example: 42abcd2b-9f3c-3d4f-0dsas
+        command_id:
+          type: integer
+          example: 1
+        document_id:
+          type: string
+          example: 42abcd2b-9f3c-3d4f-0dsas231
+        comment:
+          type: string
+          example: Причина выбора команды
+    commandResponse:
+      type: object
+      required:
+      - task_id
+      - command_id
+      - document_id
+      - command_status
+      properties:
+        task_id:
+          type: string
+          example: 42abcd2b-9f3c-3d4f-0dsas
+        command_id:
+          type: integer
+          example: 1
+        document_id:
+          type: string
+          example: 42abcd2b-9f3c-3d4f-0dsas231
+        command_status:
+          type: string
+          enum:
+            - in progress
+            - done
+            - error
+          example: В обработке
+    commandResponseArray:
+      type: array
+      items:
+        $ref: "#/components/schemas/commandResponse"
