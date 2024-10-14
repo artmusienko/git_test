@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Отправка команд в бэк 2150. ТЕСТ ДЛЯ ГИТ
-  version: 0.0.1
+  version: 2.2.8
 servers:
 - url: https://sfera.inno.local/knowledge/pages?id=1160712
   description: Dev server
